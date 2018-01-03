@@ -36,6 +36,9 @@ public class Pupil {
     @SerializedName("password")
     private String password;
 
+    public Pupil() {
+
+    }
 
     public Pupil(User user) {
         this.email = user.getEmail();
@@ -137,6 +140,13 @@ public class Pupil {
         this.isHost = isHost;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
 
 }

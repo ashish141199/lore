@@ -1,6 +1,6 @@
 package com.application.university.api;
 
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -14,6 +14,6 @@ import retrofit2.http.POST;
 public interface UserService {
 
     @POST("api/users/details/bio/update/")
-    Call<User> updateBio(@Body User user);
+    Call<Pupil> updateBio(@Body Pupil pupil);
 
 }

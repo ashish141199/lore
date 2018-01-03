@@ -14,7 +14,7 @@ import android.widget.Toast;
 
 import com.application.university.Misc.Methods;
 import com.application.university.models.Pupil;
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 import com.facebook.FacebookSdk;
 import com.facebook.login.LoginManager;
 
@@ -27,19 +27,17 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         FacebookSdk.sdkInitialize(getApplicationContext());
-        Methods.logout(this);
 
         setContentView(R.layout.activity_home);
-        getUserModel();
+        getPupilModel();
         getReferences();
 
     }
 
     //gets user model
-    private void getUserModel() {
-        User tempUser = Methods.getUserModel(getApplicationContext());
+    private void getPupilModel() {
+        currentPupil = Methods.getPupilModel(getApplicationContext());
 
-        currentPupil = new Pupil(tempUser);
     }
 
     //Method to logout of the app and also from fb sdk

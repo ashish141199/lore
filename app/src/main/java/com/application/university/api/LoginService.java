@@ -1,7 +1,7 @@
 package com.application.university.api;
 
 import com.application.university.models.SmallModels;
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 
 import org.json.JSONObject;
 
@@ -17,18 +17,18 @@ import retrofit2.http.POST;
 
 public interface LoginService {
     @POST("api/users/login/")
-    Call<User> loginUser(@Body User user);
+    Call<Pupil> loginPupil(@Body Pupil pupil);
 
     @POST("api/users/sign_up/")
-    Call<User> signUpUser(@Body User user);
+    Call<Pupil> signUpPupil(@Body Pupil pupil);
 
     @POST("api/fb/user/login_or_sign_up/")
-    Call<User> signUpOrLoginFBUser(@Body User user);
+    Call<Pupil> signUpOrLoginFBPupil(@Body Pupil pupil);
 
     @POST("api/auth/token/")
-    Call<SmallModels.TokenResponse> getJWTToken(@Body User user);
+    Call<SmallModels.TokenResponse> getJWTToken(@Body Pupil pupil);
 
     @POST("api/fb/user/check/")
-    Call<ResponseBody> checkIfNewFbUser(@Body User user);
+    Call<ResponseBody> checkIfNewFbPupil(@Body Pupil pupil);
 }
 

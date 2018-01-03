@@ -31,7 +31,7 @@ import com.application.university.api.LoginService;
 import com.application.university.models.APIError;
 import com.application.university.models.Pupil;
 import com.application.university.models.SmallModels;
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 import com.facebook.AccessToken;
 import com.facebook.AccessTokenTracker;
 import com.facebook.CallbackManager;
@@ -74,7 +74,7 @@ public class LoginActivity extends AppCompatActivity {
     // Progress Dialog Creator
     private AlertDialog b;
     private AlertDialog.Builder dialogBuilder;
-    private Button userLoginButton;
+    private Button pupilLoginButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,7 +86,7 @@ public class LoginActivity extends AppCompatActivity {
         checkEmptyFieldsForButtonDisablity();
     }
 
-    //TextWatcher for checking empty fields everytime the user enters something
+    //TextWatcher for checking empty fields everytime the pupil enters something
     private TextWatcher textWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence charSequence, int i, int i2, int i3)
@@ -109,21 +109,21 @@ public class LoginActivity extends AppCompatActivity {
         String s1 = emailTextView.getText().toString(), s2 = passwordTextView.getText().toString();
         if(s1.equals("") && s2.equals(""))
         {
-            userLoginButton.setEnabled(false);
+            pupilLoginButton.setEnabled(false);
         }
 
         else if(!s1.equals("")&&s2.equals("")){
-            userLoginButton.setEnabled(false);
+            pupilLoginButton.setEnabled(false);
         }
 
         else if(!s2.equals("")&&s1.equals(""))
         {
-            userLoginButton.setEnabled(false);
+            pupilLoginButton.setEnabled(false);
         }
 
         else
         {
-            userLoginButton.setEnabled(true);
+            pupilLoginButton.setEnabled(true);
         }
     }
 
@@ -133,7 +133,7 @@ public class LoginActivity extends AppCompatActivity {
         passwordTextView = (TextView) findViewById(R.id.login_password);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.login_coordinator);
         loginButton = (LoginButton) findViewById(R.id.fb_login_button);
-        userLoginButton = (Button) findViewById(R.id.login_button);
+        pupilLoginButton = (Button) findViewById(R.id.login_button);
 
         //adding textwatcher to text views
         emailTextView.addTextChangedListener(textWatcher);
@@ -152,11 +152,11 @@ public class LoginActivity extends AppCompatActivity {
                  GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
                     @Override
                     public void onCompleted(JSONObject object, GraphResponse response) {
-                        User newFbUser = new User();
+                        Pupil newFbPupil = new Pupil();
                         try {
-                            newFbUser.setEmail(object.getString("email"));
-                            newFbUser.setFullName(object.getString("name"));
-                            checkIfNewFbUser(newFbUser);
+                            newFbPupil.setEmail(object.getString("email"));
+                            newFbPupil.setFullName(object.getString("name"));
+                            checkIfNewFbPupil(newFbPupil);
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -169,7 +169,7 @@ public class LoginActivity extends AppCompatActivity {
                 parameters.putString("fields", "id,name,email");
                 request.setParameters(parameters);
                 request.executeAsync();
-//                checkIfNewFbUser();
+//                checkIfNewFbPupil();
 //                Methods.goToProfileCreationActivity(LoginActivity.this, true);
 
             }
@@ -190,11 +190,11 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //checks if already existing fb user or a new user
-    private void checkIfNewFbUser(User newFbUser) {
+    //checks if already existing fb pupil or a new pupil
+    private void checkIfNewFbPupil(Pupil newFbPupil) {
         //create login service for api call
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
-        Call<ResponseBody> call = loginService.checkIfNewFbUser(newFbUser);
+        Call<ResponseBody> call = loginService.checkIfNewFbPupil(newFbPupil);
 
         call.enqueue(new Callback<ResponseBody>() {
             @Override
@@ -206,7 +206,7 @@ public class LoginActivity extends AppCompatActivity {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-                checkIfNewFbUser_errorHandling(error);
+                checkIfNewFbPupil_errorHandling(error);
             }
 
             @Override
@@ -218,35 +218,35 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //error handling for checkIfNewFbUser function
-    private void checkIfNewFbUser_errorHandling(APIError error) {
+    //error handling for checkIfNewFbPupil function
+    private void checkIfNewFbPupil_errorHandling(APIError error) {
         String message = error.message();
         int status = error.status();
         if (status == 200) {
-            createOrLoginFbUser(true);
+            createOrLoginFbPupil(true);
         } else if (status == 409) {
             //Email is already taken
             Snackbar.make(coordinatorLayout, error.message(), Snackbar.LENGTH_LONG).show();
         } else if (status == 201) {
             //email is available
-            createOrLoginFbUser(false);
+            createOrLoginFbPupil(false);
         }
     }
 
-    //gets user details from fb graph api and sends to server to create a new FB User
-    private void createOrLoginFbUser(final Boolean homeActivityRedirect) {
+    //gets pupil details from fb graph api and sends to server to create a new FB Pupil
+    private void createOrLoginFbPupil(final Boolean homeActivityRedirect) {
         GraphRequest request = GraphRequest.newMeRequest(accessToken, new GraphRequest.GraphJSONObjectCallback() {
             @Override
             public void onCompleted(JSONObject object, GraphResponse response) {
-                User fbUser = new User();
+                Pupil fbPupil = new Pupil();
                 try {
-                    fbUser.setEmail(object.getString("email"));
-                    fbUser.setFullName(object.getString("name"));
-                    fbUser.setFbUser(true);
+                    fbPupil.setEmail(object.getString("email"));
+                    fbPupil.setFullName(object.getString("name"));
+                    fbPupil.setFbUser(true);
 
 
                     //sends to server
-                    sendFbUserToServer(fbUser, homeActivityRedirect);
+                    sendFbPupilToServer(fbPupil, homeActivityRedirect);
 
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -264,25 +264,25 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //sends fbuser details acquired from graph api to server
-    private void sendFbUserToServer(User user, final Boolean homeActivityRedirect) {
+    //sends fbpupil details acquired from graph api to server
+    private void sendFbPupilToServer(Pupil pupil, final Boolean homeActivityRedirect) {
         //creating service
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
-        Call<User> call = loginService.signUpOrLoginFBUser(user);
+        Call<Pupil> call = loginService.signUpOrLoginFBPupil(pupil);
         showProgressDialog();
         //calling server
-        call.enqueue(new Callback<User>() {
+        call.enqueue(new Callback<Pupil>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<Pupil> call, Response<Pupil> response) {
                 if (response.isSuccessful()) {
                     //if successful
-                    //store user details and redirect to profile creation
-                    User newUser = response.body();
-                    storeUserDetails(response);
+                    //store pupil details and redirect to profile creation
+                    Pupil newPupil = response.body();
+                    storePupilDetails(response);
 
-                    //check if user was logged in or signed up
+                    //check if pupil was logged in or signed up
                     if (homeActivityRedirect) {
-                        //user was logged in. welcome back
+                        //pupil was logged in. welcome back
                         //hide progress dialog
                         hideProgressDialog();
                         Snackbar.make(coordinatorLayout, "Welcome Back to Lore", Snackbar.LENGTH_LONG).show();
@@ -307,7 +307,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Pupil> call, Throwable t) {
                 hideProgressDialog();
                 Snackbar.make(coordinatorLayout, t.getMessage(), Snackbar.LENGTH_LONG).show();
             }
@@ -315,39 +315,38 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //stores passed user details to SharedPreferences
-    private void storeUserDetails(Response<User> response) {
-        User user = response.body();
-        Pupil pupil = new Pupil(user);
+    //stores passed pupil details to SharedPreferences
+    private void storePupilDetails(Response<Pupil> response) {
+        Pupil pupil = response.body();
         Gson json = new Gson();
-        String jsonUser = json.toJson(pupil);
+        String jsonPupil = json.toJson(pupil);
         SharedPreferences.Editor sharedPreferencesEditor = getApplicationContext().getSharedPreferences("LorePrefs", Context.MODE_PRIVATE).edit();
-        sharedPreferencesEditor.putString("currentUser", jsonUser);
+        sharedPreferencesEditor.putString("currentPupil", jsonPupil);
         sharedPreferencesEditor.putBoolean("isLoggedIn", true);
         sharedPreferencesEditor.apply();
     }
 
     //    Login Button was pressed
-    public void userLogin(View view) {
+    public void pupilLogin(View view) {
         //hides keyboard so snackbar would be visible
         Methods.hideKeyboard(this);
 
         String login_email = emailTextView.getText().toString();
         final String login_password = passwordTextView.getText().toString();
 
-        //Creating a user with the above credentials
-        User user = new User();
-        user.setEmail(emailTextView.getText().toString());
-        user.setPassword(passwordTextView.getText().toString());
+        //Creating a pupil with the above credentials
+        Pupil pupil = new Pupil();
+        pupil.setEmail(emailTextView.getText().toString());
+        pupil.setPassword(passwordTextView.getText().toString());
 
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
-        Call<User> call = loginService.loginUser(user);
+        Call<Pupil> call = loginService.loginPupil(pupil);
         showProgressDialog();
-        call.enqueue(new Callback<User>() {
+        call.enqueue(new Callback<Pupil>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<Pupil> call, Response<Pupil> response) {
                 if (response.isSuccessful()) {
-                    storeUserDetails(response);
+                    storePupilDetails(response);
                     getJWTToken(response.body().getEmail(), login_password);
                     hideProgressDialog();
 //                    Methods.goToProfileCreationActivity(getApplicationContext(), false);
@@ -364,7 +363,7 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Pupil> call, Throwable t) {
                 hideProgressDialog();
                 Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
                 snackbarErrorHandling(t);
@@ -374,16 +373,16 @@ public class LoginActivity extends AppCompatActivity {
 
     }
 
-    //gets jwt token from django server and stores in user model
+    //gets jwt token from django server and stores in pupil model
     private void getJWTToken(String email, String password) {
-        //creating temporary user
-        User tempUser = new User();
-        tempUser.setEmail(email);
-        tempUser.setPassword(password);
+        //creating temporary pupil
+        Pupil tempPupil = new Pupil();
+        tempPupil.setEmail(email);
+        tempPupil.setPassword(password);
 
-        //sending temp user to server
+        //sending temp pupil to server
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
-        Call<SmallModels.TokenResponse> call = loginService.getJWTToken(tempUser);
+        Call<SmallModels.TokenResponse> call = loginService.getJWTToken(tempPupil);
 
         call.enqueue(new Callback<SmallModels.TokenResponse>() {
             @Override
@@ -397,12 +396,12 @@ public class LoginActivity extends AppCompatActivity {
                     if (token.equals("")) {
                         Snackbar.make(coordinatorLayout, "There seems to be some Error", Snackbar.LENGTH_LONG).show();
                     }
-                    User user = Methods.getUserModel(LoginActivity.this);
-                    user.setAuthToken(token);
+                    Pupil pupil = Methods.getPupilModel(LoginActivity.this);
+                    pupil.setAuthToken(token);
                     Gson gson = new Gson();
-                    String json = gson.toJson(user);
+                    String json = gson.toJson(pupil);
                     SharedPreferences.Editor sharedPreferencesEditor = getApplicationContext().getSharedPreferences("LorePrefs", Context.MODE_PRIVATE).edit();
-                    sharedPreferencesEditor.putString("currentUser", json);
+                    sharedPreferencesEditor.putString("currentPupil", json);
                     sharedPreferencesEditor.putBoolean("isLoggedIn", true);
                     sharedPreferencesEditor.apply();
                     Methods.goToHomeActivity(LoginActivity.this, true);

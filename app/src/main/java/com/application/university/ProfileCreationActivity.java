@@ -22,7 +22,7 @@ import com.application.university.Misc.ServiceGenerator;
 import com.application.university.api.LoginService;
 import com.application.university.api.UserService;
 import com.application.university.models.APIError;
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 import com.facebook.AccessToken;
 import com.facebook.GraphRequest;
 import com.facebook.GraphResponse;
@@ -45,9 +45,9 @@ public class ProfileCreationActivity extends AppCompatActivity {
     private EditText fullNameEditText;
     private CoordinatorLayout coordinator;
     private ProgressBar progressBar;
-    private Boolean fbUserBoolean;
-    private User newFbUser;
-    private User prefsUserModel;
+    private Boolean fbPupilBoolean;
+    private Pupil newFbPupil;
+    private Pupil prefsPupilModel;
     // Progress Dialog Creator
     private AlertDialog b;
     private AlertDialog.Builder dialogBuilder;
@@ -58,8 +58,8 @@ public class ProfileCreationActivity extends AppCompatActivity {
         setContentView(R.layout.activity_profile_creation);
 
         getReferences();
-        getPrefsUserModel();
-        insertValuesFromUserModel();
+        getPrefsPupilModel();
+        insertValuesFromPupilModel();
 
     }
 
@@ -74,37 +74,37 @@ public class ProfileCreationActivity extends AppCompatActivity {
     }
 
     //gets user model from shared prefs
-    private void getPrefsUserModel() {
-        prefsUserModel = Methods.getUserModel(getApplicationContext());
+    private void getPrefsPupilModel() {
+        prefsPupilModel = Methods.getPupilModel(getApplicationContext());
     }
 
     //gets values from the current user model and displays inside the displayed fields
-    private void insertValuesFromUserModel() {
-        emailEditText.setText(prefsUserModel.getEmail());
-        fullNameEditText.setText(prefsUserModel.getFullName());
+    private void insertValuesFromPupilModel() {
+        emailEditText.setText(prefsPupilModel.getEmail());
+        fullNameEditText.setText(prefsPupilModel.getFullName());
     }
 
     //next button click action
     public void next(View view) {
         String bioText = bioEditText.getText().toString();
         showProgress();
-        updateUserBio(bioText);
+        updatePupilBio(bioText);
     }
 
     //updates the user bio on server and stores the returned model in sharedprefs
-    private void updateUserBio(String bio) {
-        prefsUserModel.setBio(bio);
-        String token = prefsUserModel.getAuthToken();
-        UserService userService = ServiceGenerator.createService(UserService.class, prefsUserModel.getEmail(), token);
-        Call<User> call = userService.updateBio(prefsUserModel);
+    private void updatePupilBio(String bio) {
+        prefsPupilModel.setBio(bio);
+        String token = prefsPupilModel.getAuthToken();
+        UserService userService = ServiceGenerator.createService(UserService.class, prefsPupilModel.getEmail(), token);
+        Call<Pupil> call = userService.updateBio(prefsPupilModel);
 
-        call.enqueue(new Callback<User>() {
+        call.enqueue(new Callback<Pupil>() {
             @Override
-            public void onResponse(Call<User> call, Response<User> response) {
+            public void onResponse(Call<Pupil> call, Response<Pupil> response) {
                 if (response.isSuccessful()) {
-                    User updatedUser = response.body();
-//                    Toast.makeText(ProfileCreationActivity.this, "Bio: " + updatedUser.getBio().toString(), Toast.LENGTH_SHORT).show();
-                    storeUserDetails(response);
+                    Pupil updatedPupil = response.body();
+//                    Toast.makeText(ProfileCreationActivity.this, "Bio: " + updatedPupil.getBio().toString(), Toast.LENGTH_SHORT).show();
+                    storePupilDetails(response);
                     hideProgress();
                     Methods.goToHomeActivity(getApplicationContext(), true);
                     finish();
@@ -117,7 +117,7 @@ public class ProfileCreationActivity extends AppCompatActivity {
             }
 
             @Override
-            public void onFailure(Call<User> call, Throwable t) {
+            public void onFailure(Call<Pupil> call, Throwable t) {
                 Snackbar.make(coordinator, t.getMessage(), Snackbar.LENGTH_LONG).show();
                 hideProgress();
 
@@ -126,12 +126,12 @@ public class ProfileCreationActivity extends AppCompatActivity {
     }
 
     //stores passed user details to SharedPreferences
-    private void storeUserDetails(Response<User> response) {
-        User user = response.body();
+    private void storePupilDetails(Response<Pupil> response) {
+        Pupil user = response.body();
         Gson json = new Gson();
-        String jsonUser = json.toJson(user);
+        String jsonPupil = json.toJson(user);
         SharedPreferences.Editor sharedPreferencesEditor = getApplicationContext().getSharedPreferences("LorePrefs", Context.MODE_PRIVATE).edit();
-        sharedPreferencesEditor.putString("currentUser", jsonUser);
+        sharedPreferencesEditor.putString("currentPupil", jsonPupil);
         sharedPreferencesEditor.putBoolean("isLoggedIn", true);
         sharedPreferencesEditor.apply();
     }

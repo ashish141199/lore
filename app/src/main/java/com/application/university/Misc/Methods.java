@@ -17,7 +17,7 @@ import com.application.university.ProfileCreationActivity;
 import com.application.university.R;
 import com.application.university.SignUpActivity;
 import com.application.university.models.Pupil;
-import com.application.university.models.User;
+import com.application.university.models.Pupil;
 import com.google.gson.Gson;
 
 /**
@@ -60,22 +60,22 @@ public class Methods {
         Intent i = new Intent(context, SignUpActivity.class);
         context.startActivity(i);
     }
-
-    //retrieves user model from sharedprefs and returns it
-    public static User getUserModel(Context context) {
-        SharedPreferences sharedPreferences = context.getSharedPreferences("LorePrefs", Context.MODE_PRIVATE);
-        String json = sharedPreferences.getString("currentUser", "None");
-        if (json.equals("None")) {
-            return null;
-        }
-        Gson gson = new Gson();
-        User user = gson.fromJson(json, User.class);
-        return user;
-    }
+//
+//    //retrieves user model from sharedprefs and returns it
+//    public static User geUserModel(Context context) {
+//        SharedPreferences sharedPreferences = context.getSharedPreferences("LorePrefs", Context.MODE_PRIVATE);
+//        String json = sharedPreferences.getString("currentPupil", "None");
+//        if (json.equals("None")) {
+//            return null;
+//        }
+//        Gson gson = new Gson();
+//        User user = gson.fromJson(json, User.class);
+//        return user;
+//    }
 
     public static Pupil getPupilModel(Context context) {
         SharedPreferences sharedPreferences = context.getSharedPreferences("LorePrefs", Context.MODE_PRIVATE);
-        String json = sharedPreferences.getString("currentUser", "None");
+        String json = sharedPreferences.getString("currentPupil", "None");
         if (json.equals("None")) {
             return null;
         }
@@ -87,7 +87,7 @@ public class Methods {
     public static void logout(Context context) {
         SharedPreferences.Editor sharedPreferences = context.getSharedPreferences("LorePrefs", Context.MODE_PRIVATE).edit();
         sharedPreferences.putBoolean("isLoggedIn", false);
-        sharedPreferences.remove("currentUser");
+        sharedPreferences.remove("currentPupil");
         sharedPreferences.apply();
         goToLoginActivity(context);
     }
