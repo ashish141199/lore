@@ -40,12 +40,7 @@ public class Methods {
     public static void goToHomeActivity(Context context, Boolean finish) {
 
         Intent i = new Intent(context, HomeActivity.class);
-        if (finish) {
-            context.startActivity(i);
-
-        } else {
-            context.startActivity(i);
-        }
+        context.startActivity(i);
     }
 
     //Switch Activity to ProfileCreationActivity

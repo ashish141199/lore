@@ -446,6 +446,7 @@ public class SignUpActivity extends AppCompatActivity {
     //redirects to log in activity
     public void goToLogIn(View view) {
         Methods.goToLoginActivity(getApplicationContext());
+        finish();
     }
 
     //shows progress dialog box

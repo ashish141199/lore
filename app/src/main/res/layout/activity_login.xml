@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_weight="0"
-            android:onClick="userLogin"
+            android:onClick="pupilLogin"
             android:text="Log In" />
 
         <com.facebook.login.widget.LoginButton

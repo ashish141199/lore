@@ -147,6 +147,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
             @Override
             public void onSuccess(LoginResult loginResult) {
+                showProgressDialog();
                 accessToken = loginResult.getAccessToken();
                 setResult(RESULT_OK);
                  GraphRequest request = GraphRequest.newMeRequest(loginResult.getAccessToken(), new GraphRequest.GraphJSONObjectCallback() {
@@ -157,6 +158,8 @@ public class LoginActivity extends AppCompatActivity {
                             newFbPupil.setEmail(object.getString("email"));
                             newFbPupil.setFullName(object.getString("name"));
                             checkIfNewFbPupil(newFbPupil);
+                            hideProgressDialog();
+
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -169,19 +172,21 @@ public class LoginActivity extends AppCompatActivity {
                 parameters.putString("fields", "id,name,email");
                 request.setParameters(parameters);
                 request.executeAsync();
-//                checkIfNewFbPupil();
-//                Methods.goToProfileCreationActivity(LoginActivity.this, true);
+
+
 
             }
 
             @Override
             public void onCancel() {
+                hideProgressDialog();
                 setResult(RESULT_CANCELED);
                 Snackbar.make(coordinatorLayout, "Facebook Login was Cancelled", Snackbar.LENGTH_LONG).show();
             }
 
             @Override
             public void onError(FacebookException error) {
+                hideProgressDialog();
                 Snackbar.make(coordinatorLayout, error.getMessage(), Snackbar.LENGTH_LONG).show();
 
             }
@@ -192,6 +197,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //checks if already existing fb pupil or a new pupil
     private void checkIfNewFbPupil(Pupil newFbPupil) {
+
         //create login service for api call
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
         Call<ResponseBody> call = loginService.checkIfNewFbPupil(newFbPupil);
@@ -211,7 +217,8 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<ResponseBody> call, Throwable t) {
-
+                hideProgressDialog();
+                Toast.makeText(LoginActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -269,7 +276,6 @@ public class LoginActivity extends AppCompatActivity {
         //creating service
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
         Call<Pupil> call = loginService.signUpOrLoginFBPupil(pupil);
-        showProgressDialog();
         //calling server
         call.enqueue(new Callback<Pupil>() {
             @Override
@@ -328,6 +334,7 @@ public class LoginActivity extends AppCompatActivity {
 
     //    Login Button was pressed
     public void pupilLogin(View view) {
+        showProgressDialog();
         //hides keyboard so snackbar would be visible
         Methods.hideKeyboard(this);
 
@@ -341,14 +348,12 @@ public class LoginActivity extends AppCompatActivity {
 
         LoginService loginService = ServiceGenerator.createService(LoginService.class);
         Call<Pupil> call = loginService.loginPupil(pupil);
-        showProgressDialog();
         call.enqueue(new Callback<Pupil>() {
             @Override
             public void onResponse(Call<Pupil> call, Response<Pupil> response) {
                 if (response.isSuccessful()) {
                     storePupilDetails(response);
                     getJWTToken(response.body().getEmail(), login_password);
-                    hideProgressDialog();
 //                    Methods.goToProfileCreationActivity(getApplicationContext(), false);
 
 
@@ -409,6 +414,7 @@ public class LoginActivity extends AppCompatActivity {
 
                 } else {
                     APIError error = ErrorUtils.parseError(response);
+                    hideProgressDialog();
                     Toast.makeText(LoginActivity.this, "JWT Error: " + error.message(), Toast.LENGTH_SHORT).show();
 
                 }
@@ -416,6 +422,7 @@ public class LoginActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<SmallModels.TokenResponse> call, Throwable t) {
+                hideProgressDialog();
                 Snackbar.make(coordinatorLayout, t.getMessage(), Snackbar.LENGTH_LONG).show();
             }
         });
@@ -424,6 +431,7 @@ public class LoginActivity extends AppCompatActivity {
     //redirects to sign up activity
     public void goToSignUp(View view) {
         Methods.goToSignUpActivity(this);
+        finish();
     }
 
     //handles login snackbar error handling
